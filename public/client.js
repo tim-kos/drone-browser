@@ -1,14 +1,17 @@
 (function() {
-  var faye, keymap, speed;
+  var faye, keymap;
+
   faye = new Faye.Client("/faye", {
     timeout: 120
   });
+
   faye.subscribe("/drone/navdata", function(data) {
     ["batteryPercentage", "clockwiseDegrees", "altitudeMeters", "frontBackDegrees", "leftRightDegrees", "xVelocity", "yVelocity", "zVelocity"].forEach(function(type) {
       return $("#" + type).html(Math.round(data.demo[type], 4));
     });
     return showBatteryStatus(data.demo.batteryPercentage);
   });
+
   window.showBatteryStatus = function(batteryPercentage) {
     $("#batterybar").width("" + batteryPercentage + "%");
     if (batteryPercentage < 30) {
@@ -21,11 +24,28 @@
       "data-original-title": "Battery status: " + batteryPercentage + "%"
     });
   };
+
   faye.subscribe("/drone/image", function(src) {
     return $("#cam").attr({
       src: src
     });
   });
+
+  setInterval(function() {
+    for (var code in keymap) {
+      var key = keymap[code];
+      if (!key || !key.down) {
+        continue;
+      }
+
+      faye.publish("/drone/" + key.ev, {
+        action: key.action,
+        speed: 1,
+        duration: key.duration
+      });
+    }
+  }, 100);
+
   keymap = {
     87: {
       ev: 'move',
@@ -67,12 +87,12 @@
       ev: 'drone',
       action: 'land'
     },
-    49: {
+    70: {
       ev: 'animate',
       action: 'flipAhead',
       duration: 15
     },
-    50: {
+    71: {
       ev: 'animate',
       action: 'flipLeft',
       duration: 15
@@ -97,27 +117,28 @@
       action: 'disableEmergency'
     }
   };
-  speed = 0;
+
   $(document).keydown(function(ev) {
-    var evData;
-    if (keymap[ev.keyCode] == null) {
+    if (!keymap[ev.keyCode]) {
       return;
     }
+
+    keymap[ev.keyCode].down = true;
     ev.preventDefault();
-    speed = speed >= 1 ? 1 : speed + 0.08 / (1 - speed);
-    evData = keymap[ev.keyCode];
-    return faye.publish("/drone/" + evData.ev, {
-      action: evData.action,
-      speed: speed,
-      duration: evData.duration
-    });
   });
+
   $(document).keyup(function(ev) {
-    speed = 0;
+    if (!keymap[ev.keyCode]) {
+      return;
+    }
+
+    keymap[ev.keyCode].down = false;
     return faye.publish("/drone/drone", {
       action: 'stop'
     });
   });
+
+
   $("*[data-action]").on("mousedown", function(ev) {
     return faye.publish("/drone/" + $(this).attr("data-action"), {
       action: $(this).attr("data-param"),
@@ -125,11 +146,13 @@
       duration: 1000 * parseInt($("#duration").val())
     });
   });
+
   $("*[data-action]").on("mouseup", function(ev) {
     return faye.publish("/drone/move", {
       action: $(this).attr("data-param"),
       speed: $(this).attr("data-action") === "move" ? 0 : void 0
     });
   });
+
   $("*[rel=tooltip]").tooltip();
 }).call(this);
