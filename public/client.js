@@ -11,7 +11,7 @@ window.showBatteryStatus = function(batteryPercentage) {
   });
 };
 
-(function() {
+$(function() {
   var faye = new Faye.Client("/faye", {timeout: 120});
   var keymap = {
     87: {ev: 'move', action: 'front'},
@@ -26,18 +26,21 @@ window.showBatteryStatus = function(batteryPercentage) {
     27: {ev: 'drone', action: 'land'},
     70: {ev: 'animate', action: 'flipAhead', duration: 15},
     71: {ev: 'animate', action: 'flipLeft', duration: 15},
-    51: {ev: 'animate', action: 'yawShake', duration: 15},
-    52: {ev: 'animate', action: 'doublePhiThetaMixed', duration: 15},
-    53: {ev: 'animate', action: 'wave', duration: 15},
+    67: {ev: 'animate', action: 'yawShake', duration: 2000},
+    80: {ev: 'animate', action: 'doublePhiThetaMixed', duration: 2000},
+    90: {ev: 'animate', action: 'wave', duration: 2000},
     69: {ev: 'drone', action: 'disableEmergency'}
   };
 
+var i = 0;
   faye.subscribe("/drone/navdata", function(data) {
     var types = [
-      "batteryPercentage", "clockwiseDegrees", "altitudeMeters",
+      "batteryPercentage", "clockwiseDegrees",
       "frontBackDegrees", "leftRightDegrees", "xVelocity", "yVelocity",
       "zVelocity"
     ];
+
+  $("#altitudeMeters").html(Math.round(data.demo['altitudeMeters'] * 100, 1));
     types.forEach(function(type) {
       return $("#" + type).html(Math.round(data.demo[type], 4));
     });
@@ -100,4 +103,4 @@ window.showBatteryStatus = function(batteryPercentage) {
   });
 
   $("*[rel=tooltip]").tooltip();
-}).call(this);
+});
