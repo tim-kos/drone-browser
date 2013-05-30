@@ -1,12 +1,15 @@
 var connected = false;
 
-window.showBatteryStatus = function(batteryPercentage) {
+function showBatteryStatus(batteryPercentage) {
   var $progress = $("#batteryProgress");
+  var $bar = $("#batterybar");
+  var percent = batteryPercentage + "%";
+
+  $bar.css({width: percent});
+
   var warningClass = "progress-warning";
   var dangerClass = "progress-danger";
   var successClass = "progress-success";
-
-  $("#batterybar").width("" + batteryPercentage + "%");
   if (batteryPercentage < 30) {
     $progress.removeClass(successClass).addClass(warningClass);
   }
@@ -14,9 +17,8 @@ window.showBatteryStatus = function(batteryPercentage) {
     $progress.removeClass(warningClass).addClass(dangerClass);
   }
 
-  var msg = "Battery status: " + batteryPercentage + "%";
-
-  return $progress.attr({"data-original-title": msg});
+  $progress.find('span').text(percent);
+  $('.js-battery-status').text(percent);
 };
 
 $(function() {
@@ -40,10 +42,13 @@ $(function() {
     69: {ev: 'drone', action: 'disableEmergency'} // e
   };
 
-  checkConnectStatus();
+  setTimeout(function() {
+    checkConnectStatus();
+  }, 500);
+
   setInterval(function() {
     checkConnectStatus();
-  }, 1000);
+  }, 2000);
 
   setInterval(function() {
     connected = false;
