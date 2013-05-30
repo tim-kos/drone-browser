@@ -41,6 +41,16 @@ var fs = require('fs');
     saveNextFrame = true;
   });
 
+  socket.subscribe("/drone/switchtofrontcamera", function(cmd) {
+    drone.config('video:video_channel', 0);
+    console.log('Switched to front camera');
+  });
+
+  socket.subscribe("/drone/switchtobottomcamera", function(cmd) {
+    drone.config('video:video_channel', 3);
+    console.log('Switched to bottom camera');
+  });
+
   socket.subscribe("/drone/drone", function(cmd) {
     var _name;
     console.log('drone command: ', cmd);

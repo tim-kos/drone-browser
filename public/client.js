@@ -127,7 +127,16 @@ $(function() {
 
   $(".js-take-photo").on("click", function(ev) {
     ev.preventDefault();
-    faye.publish("/drone/takephoto", {foo: 'bar'});
+    faye.publish("/drone/takephoto", {});
+  });
+
+  $(".js-switch-to-front-camera").on("click", function(ev) {
+    ev.preventDefault();
+    faye.publish("/drone/switchtofrontcamera", {});
+  });
+  $(".js-switch-to-bottom-camera").on("click", function(ev) {
+    ev.preventDefault();
+    faye.publish("/drone/switchtobottomcamera", {});
   });
 
   $("*[rel=tooltip]").tooltip();
