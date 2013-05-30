@@ -190,12 +190,14 @@ function fire() {
   playFireSound();
   var opts = {
     action: 'fire',
-    duration: 4000,
+    duration: 2000,
     hz: 5
   };
   return faye.publish("/drone/animateLeds", opts);
 }
 
 function playFireSound() {
-  document.getElementById('fire_sound').play();
+  setTimeout(function() {
+    document.getElementById('fire_sound').play();
+  }, 900);
 }
