@@ -1,11 +1,12 @@
+var express = require("express");
+var faye = require("faye");
+var path = require("path");
+var drone = require("ar-drone").createClient();
+var fs = require('fs');
+
 (function() {
-  var app, currentImg, drone, express, faye, imageSendingPaused, path, server, socket;
-  express = require("express");
-  faye = require("faye");
-  path = require("path");
-  drone = require("ar-drone").createClient();
   drone.config('general:navdata_demo', 'TRUE');
-  app = express();
+  var app = express();
 
   app.configure(function() {
     app.set('port', process.env.PORT || 3001);
@@ -15,14 +16,14 @@
     return app.use("/components", express.static(path.join(__dirname, 'components')));
   });
 
-  server = require("http").createServer(app);
+  var server = require("http").createServer(app);
 
   new faye.NodeAdapter({
     mount: '/faye',
     timeout: 45
   }).attach(server);
 
-  socket = new faye.Client("http://localhost:" + (app.get("port")) + "/faye");
+  var socket = new faye.Client("http://localhost:" + (app.get("port")) + "/faye");
   socket.subscribe("/drone/move", function(cmd) {
     var _name;
     console.log("move", cmd);
@@ -34,6 +35,12 @@
     return drone.animate(cmd.action, cmd.duration);
   });
 
+  var saveNextFrame = false;
+  socket.subscribe("/drone/takephoto", function(cmd) {
+    console.log('must take photo');
+    saveNextFrame = true;
+  });
+
   socket.subscribe("/drone/drone", function(cmd) {
     var _name;
     console.log('drone command: ', cmd);
@@ -43,17 +50,29 @@
   server.listen(app.get("port"), function() {
     return console.log("Express server listening on port " + app.get("port"));
   });
-  currentImg = null;
+
+
+  var currentImg = null;
   drone.on('navdata', function(data) {
     return socket.publish("/drone/navdata", data);
   });
 
-  imageSendingPaused = false;
+  var imageSendingPaused = false;
+
+  var frameCount = 0;
   drone.createPngStream().on("data", function(frame) {
     currentImg = frame;
     if (imageSendingPaused) {
       return;
     }
+
+    if (saveNextFrame) {
+      frameCount++;
+      savePhoto(frame, frameCount);
+
+      saveNextFrame = false;
+    }
+
     socket.publish("/drone/image", "/image/" + (Math.random()));
     imageSendingPaused = true;
     return setTimeout(function() {
@@ -68,3 +87,18 @@
     return res.end(currentImg, "binary");
   });
 }).call(this);
+
+function savePhoto(frame, count) {
+  var thePath = path.join(__dirname, 'pics');
+  if (count > 10) {
+    return;
+  }
+
+  fs.writeFile(thePath + '/' + count + '.png', frame, function(err) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log("Photo was saved!", count + '.png');
+    }
+  });
+}

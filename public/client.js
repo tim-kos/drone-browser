@@ -125,6 +125,12 @@ $(function() {
     });
   });
 
+  $(".js-take-photo").on("click", function(ev) {
+    ev.preventDefault();
+console.log('take photo');
+    faye.publish("/drone/takephoto", {foo: 'bar'});
+  });
+
   $("*[rel=tooltip]").tooltip();
 });
 
