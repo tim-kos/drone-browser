@@ -103,6 +103,7 @@ var fs = require('fs');
 }).call(this);
 
 function savePhoto(frame, count) {
+  console.log('save Photo');
   var thePath = path.join(__dirname, 'pics');
   if (count > 10) {
     return;

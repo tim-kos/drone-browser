@@ -1,28 +1,7 @@
 var connected = false;
-
-function showBatteryStatus(batteryPercentage) {
-  var $progress = $("#batteryProgress");
-  var $bar = $("#batterybar");
-  var percent = batteryPercentage + "%";
-
-  $bar.css({width: percent});
-
-  var warningClass = "progress-warning";
-  var dangerClass = "progress-danger";
-  var successClass = "progress-success";
-  if (batteryPercentage < 30) {
-    $progress.removeClass(successClass).addClass(warningClass);
-  }
-  if (batteryPercentage < 15) {
-    $progress.removeClass(warningClass).addClass(dangerClass);
-  }
-
-  $progress.find('span').text(percent);
-  $('.js-battery-status').text(percent);
-};
+var faye = new Faye.Client("/faye", {timeout: 120});
 
 $(function() {
-  var faye = new Faye.Client("/faye", {timeout: 120});
   var keymap = {
     87: {ev: 'move', action: 'front'}, // w
     83: {ev: 'move', action: 'back'}, // s
@@ -34,8 +13,9 @@ $(function() {
     39: {ev: 'move', action: 'clockwise'}, // cursor right
     84: {ev: 'drone', action: 'takeoff'}, // t
     76: {ev: 'drone', action: 'land'},  // l
-    70: {ev: 'animate', action: 'flipAhead', duration: 15}, // f
+    70: {ev: 'func', action: 'fire'}, // f
     71: {ev: 'animate', action: 'flipLeft', duration: 15}, // g
+    72: {ev: 'animate', action: 'flipAhead', duration: 15}, // h
     67: {ev: 'animate', action: 'yawShake', duration: 2000}, // c
     80: {ev: 'animate', action: 'doublePhiThetaMixed', duration: 2000}, // p
     // 87: {ev: 'animate', action: 'wave', duration: 2000}, // w
@@ -82,6 +62,10 @@ $(function() {
         continue;
       }
 
+      if (key.ev === 'func') {
+        return fire();
+      }
+
       faye.publish("/drone/" + key.ev, {
         action: key.action,
         speed: 1,
@@ -124,6 +108,10 @@ $(function() {
     if (action === 'animateLeds') {
       var $hz = $("#animate-hz");
       opts.hz = parseInt($hz.val(), 10);
+
+      if (opts.action === 'fire') {
+        playFireSound();
+      }
     }
 
     return faye.publish("/drone/" + action, opts);
@@ -171,4 +159,43 @@ function checkConnectStatus() {
   } else {
     $stats.show();
   }
+}
+
+function showBatteryStatus(batteryPercentage) {
+  var $progress = $("#batteryProgress");
+  var $bar = $("#batterybar");
+  var percent = batteryPercentage + "%";
+
+  $bar.css({width: percent});
+
+  var warningClass = "progress-warning";
+  var dangerClass = "progress-danger";
+  var successClass = "progress-success";
+  if (batteryPercentage < 30) {
+    $progress.removeClass(successClass).addClass(warningClass);
+  }
+  if (batteryPercentage < 15) {
+    $progress.removeClass(warningClass).addClass(dangerClass);
+  }
+
+  $progress.find('span').text(percent);
+  $('.js-battery-status').text(percent);
+}
+
+function sequence1() {
+
+}
+
+function fire() {
+  playFireSound();
+  var opts = {
+    action: 'fire',
+    duration: 4000,
+    hz: 5
+  };
+  return faye.publish("/drone/animateLeds", opts);
+}
+
+function playFireSound() {
+  document.getElementById('fire_sound').play();
 }
