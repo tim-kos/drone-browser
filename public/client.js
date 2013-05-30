@@ -1,46 +1,64 @@
+var connected = false;
+
 window.showBatteryStatus = function(batteryPercentage) {
+  var $progress = $("#batteryProgress");
+  var warningClass = "progress-warning";
+  var dangerClass = "progress-danger";
+  var successClass = "progress-success";
+
   $("#batterybar").width("" + batteryPercentage + "%");
   if (batteryPercentage < 30) {
-    $("#batteryProgress").removeClass("progress-success").addClass("progress-warning");
+    $progress.removeClass(successClass).addClass(warningClass);
   }
   if (batteryPercentage < 15) {
-    $("#batteryProgress").removeClass("progress-warning").addClass("progress-danger");
+    $progress.removeClass(warningClass).addClass(dangerClass);
   }
-  return $("#batteryProgress").attr({
-    "data-original-title": "Battery status: " + batteryPercentage + "%"
-  });
+
+  var msg = "Battery status: " + batteryPercentage + "%";
+
+  return $progress.attr({"data-original-title": msg});
 };
 
 $(function() {
   var faye = new Faye.Client("/faye", {timeout: 120});
   var keymap = {
-    87: {ev: 'move', action: 'front'},
-    83: {ev: 'move', action: 'back'},
-    65: {ev: 'move', action: 'left'},
-    68: {ev: 'move', action: 'right'},
-    38: {ev: 'move', action: 'up'},
-    40: {ev: 'move', action: 'down'},
-    37: {ev: 'move', action: 'counterClockwise'},
-    39: {ev: 'move', action: 'clockwise'},
-    32: {ev: 'drone', action: 'takeoff'},
-    27: {ev: 'drone', action: 'land'},
-    70: {ev: 'animate', action: 'flipAhead', duration: 15},
-    71: {ev: 'animate', action: 'flipLeft', duration: 15},
-    67: {ev: 'animate', action: 'yawShake', duration: 2000},
-    80: {ev: 'animate', action: 'doublePhiThetaMixed', duration: 2000},
-    90: {ev: 'animate', action: 'wave', duration: 2000},
-    69: {ev: 'drone', action: 'disableEmergency'}
+    87: {ev: 'move', action: 'front'}, // w
+    83: {ev: 'move', action: 'back'}, // s
+    65: {ev: 'move', action: 'left'}, // a
+    68: {ev: 'move', action: 'right'}, // d
+    38: {ev: 'move', action: 'up'}, // cursor up
+    40: {ev: 'move', action: 'down'}, // cursor down
+    37: {ev: 'move', action: 'counterClockwise'}, // cursor left
+    39: {ev: 'move', action: 'clockwise'}, // cursor right
+    84: {ev: 'drone', action: 'takeoff'}, // t
+    76: {ev: 'drone', action: 'land'},  // l
+    70: {ev: 'animate', action: 'flipAhead', duration: 15}, // f
+    71: {ev: 'animate', action: 'flipLeft', duration: 15}, // g
+    67: {ev: 'animate', action: 'yawShake', duration: 2000}, // c
+    80: {ev: 'animate', action: 'doublePhiThetaMixed', duration: 2000}, // p
+    // 87: {ev: 'animate', action: 'wave', duration: 2000}, // w
+    69: {ev: 'drone', action: 'disableEmergency'} // e
   };
 
-var i = 0;
+  checkConnectStatus();
+  setInterval(function() {
+    checkConnectStatus();
+  }, 1000);
+
+  setInterval(function() {
+    connected = false;
+  }, 100);
+
+  var i = 0;
   faye.subscribe("/drone/navdata", function(data) {
+    connected = true;
     var types = [
-      "batteryPercentage", "clockwiseDegrees",
-      "frontBackDegrees", "leftRightDegrees", "xVelocity", "yVelocity",
-      "zVelocity"
+      "batteryPercentage", "clockwiseDegrees", "frontBackDegrees",
+      "leftRightDegrees", "xVelocity", "yVelocity", "zVelocity"
     ];
 
-  $("#altitudeMeters").html(Math.round(data.demo['altitudeMeters'] * 100, 1));
+    $("#altitudeMeters").html(Math.round(data.demo['altitudeMeters'] * 100, 1));
+
     types.forEach(function(type) {
       return $("#" + type).html(Math.round(data.demo[type], 4));
     });
@@ -104,3 +122,23 @@ var i = 0;
 
   $("*[rel=tooltip]").tooltip();
 });
+
+function checkConnectStatus() {
+  var $connectStatus = $('.connection-status');
+  var $stats = $('#stats');
+
+  var txt = connected ? 'Connected' : 'Not connected';
+  $connectStatus.find('span').text(txt);
+
+  if (connected) {
+    $connectStatus.addClass('connected');
+  } else {
+    $connectStatus.removeClass('connected');
+  }
+
+  if (!connected) {
+    $stats.hide();
+  } else {
+    $stats.show();
+  }
+}

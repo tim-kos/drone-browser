@@ -16,9 +16,34 @@ body {
 }
 #stats {
     position: absolute;
-    bottom: 20px; 
-    right: 20px;
-    font-size: 26px;
+    top: 550px;
+    left: 50%;
+    width: 70%;
+    margin-left: -35%;
+    font-size: 16px;
+}
+#stats li {
+    display: inline;
+    margin-left: 20px;
+    list-style-type: none;
+}
+#stats li:first-child {
+    margin-left: 0;
+}
+.connection-status {
+    position: absolute;
+    top: 480px;
+    left: 50%;
+    width: 300px;
+    margin-left: -150px;
+    text-align: center;
+    font-size: 16px;
+}
+.connection-status span {
+    color: #a00;
+}
+.connection-status.connected span {
+    color: #0a0;
 }
 .buttons {
     text-align: center;
