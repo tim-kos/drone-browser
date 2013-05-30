@@ -127,7 +127,6 @@ $(function() {
 
   $(".js-take-photo").on("click", function(ev) {
     ev.preventDefault();
-console.log('take photo');
     faye.publish("/drone/takephoto", {foo: 'bar'});
   });
 
@@ -138,7 +137,7 @@ function checkConnectStatus() {
   var $connectStatus = $('.connection-status');
   var $stats = $('#stats');
 
-  var txt = connected ? 'Connected' : 'Not connected';
+  var txt = connected ? 'Connected' : 'Disconnected';
   $connectStatus.find('span').text(txt);
 
   if (connected) {
