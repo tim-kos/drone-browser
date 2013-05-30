@@ -26,8 +26,9 @@ var fs = require('fs');
   var socket = new faye.Client("http://localhost:" + (app.get("port")) + "/faye");
   socket.subscribe("/drone/move", function(cmd) {
     var _name;
-    console.log("move", cmd);
-    return typeof drone[_name = cmd.action] === "function" ? drone[_name](cmd.speed) : void 0;
+
+    var _name = cmd.action
+    return typeof drone[_name] === "function" ? drone[_name](cmd.speed) : void 0;
   });
 
   socket.subscribe("/drone/animate", function(cmd) {
@@ -35,20 +36,23 @@ var fs = require('fs');
     return drone.animate(cmd.action, cmd.duration);
   });
 
+  socket.subscribe("/drone/animateLeds", function(cmd) {
+    cmd.duration = cmd.duration / 1000;
+    console.log('animateLeds', cmd);
+    return drone.animateLeds(cmd.action, cmd.hz, cmd.duration);
+  });
+
   var saveNextFrame = false;
   socket.subscribe("/drone/takephoto", function(cmd) {
-    console.log('must take photo');
     saveNextFrame = true;
   });
 
   socket.subscribe("/drone/switchtofrontcamera", function(cmd) {
     drone.config('video:video_channel', 0);
-    console.log('Switched to front camera');
   });
 
   socket.subscribe("/drone/switchtobottomcamera", function(cmd) {
     drone.config('video:video_channel', 3);
-    console.log('Switched to bottom camera');
   });
 
   socket.subscribe("/drone/drone", function(cmd) {

@@ -40,6 +40,35 @@
                 </ul>
                     <input class="span1" id="duration" size="3" type="number" value="2" rel="tooltip" data-placement="bottom" title="Trigger animations. You can change the duration of an animation. It defaults to 2 seconds."> <span class="add-on"><i class="icon-time"></i></span>
             </div>
+
+            <div class="input-append btn-group">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">LEDs <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li data-action="animateLeds" data-param="blinkGreenRed"><a href="#">blinkGreenRed</a></li>
+                    <li data-action="animateLeds" data-param="blinkGreen"><a href="#">blinkGreen</a></li>
+                    <li data-action="animateLeds" data-param="blinkRed"><a href="#">blinkRed</a></li>
+                    <li data-action="animateLeds" data-param="blinkOrange"><a href="#">blinkOrange</a></li>
+                    <li data-action="animateLeds" data-param="snakeGreenRed"><a href="#">snakeGreenRed</a></li>
+                    <li data-action="animateLeds" data-param="fire"><a href="#">fire</a></li>
+                    <li data-action="animateLeds" data-param="standard"><a href="#">standard</a></li>
+                    <li data-action="animateLeds" data-param="red"><a href="#">red</a></li>
+                    <li data-action="animateLeds" data-param="green"><a href="#">green</a></li>
+                    <li data-action="animateLeds" data-param="redSnake"><a href="#">redSnake</a></li>
+                    <li data-action="animateLeds" data-param="blank"><a href="#">blank</a></li>
+                    <li data-action="animateLeds" data-param="rightMissile"><a href="#">rightMissile</a></li>
+                    <li data-action="animateLeds" data-param="leftMissile"><a href="#">leftMissile</a></li>
+                    <li data-action="animateLeds" data-param="doubleMissile"><a href="#">doubleMissile</a></li>
+                    <li data-action="animateLeds" data-param="frontLeftGreenOthersRed"><a href="#">frontLeftGreenOthersRed</a></li>
+                    <li data-action="animateLeds" data-param="rearRightGreenOthersRed"><a href="#">rearRightGreenOthersRed</a></li>
+                    <li data-action="animateLeds" data-param="rearLeftGreenOthersRed"><a href="#">rearLeftGreenOthersRed</a></li>
+                    <li data-action="animateLeds" data-param="leftGreenRightRed"><a href="#">leftGreenRightRed</a></li>
+                    <li data-action="animateLeds" data-param="leftRedRightGreen"><a href="#">leftRedRightGreen</a></li>
+                    <li data-action="animateLeds" data-param="blinkStandard"><a href="#">blinkStandard</a></li>
+                </ul>
+                    <input class="span1" id="animate-duration" size="3" type="number" value="2" rel="tooltip" data-placement="bottom" title="Animation duration"> <span class="add-on"><i class="icon-time"></i></span>
+
+                    <input class="span1" id="animate-hz" size="3" type="number" value="5" rel="tooltip" data-placement="bottom" title="Animation Hertz"> <span class="add-on"><i class="icon-time"></i></span>
+            </div>
         </div>
     </div>
     <div id="batteryProgress" class="progress progress-success progress-striped" title="Battery status" rel="tooltip" data-placement="right">
@@ -48,7 +77,7 @@
     </div>
 
     <img id="cam" src="default.jpg" />
-    <div class="connection-status">Connection status: <span>Disconnected</span></div>
+    <div class="connection-status">Status: <span>Disconnected</span></div>
 
     <ul id="stats">
         <li>Direction: <span id="clockwiseDegrees"></span>°</li>

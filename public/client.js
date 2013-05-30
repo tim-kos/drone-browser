@@ -111,11 +111,22 @@ $(function() {
 
   $("*[data-action]").on("mousedown", function(e) {
     var action = $(this).attr("data-action");
-    return faye.publish("/drone/" + action, {
+    var $duration = $("#duration");
+    if (action === 'animateLeds') {
+      $duration = $('#animate-duration');
+    }
+
+    var opts = {
       action: $(this).attr("data-param"),
       speed: 0.3,
-      duration: 1000 * parseInt($("#duration").val(), 10)
-    });
+      duration: 1000 * parseInt($duration.val(), 10)
+    };
+    if (action === 'animateLeds') {
+      var $hz = $("#animate-hz");
+      opts.hz = parseInt($hz.val(), 10);
+    }
+
+    return faye.publish("/drone/" + action, opts);
   });
 
   $("*[data-action]").on("mouseup", function(ev) {
