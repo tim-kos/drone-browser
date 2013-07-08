@@ -3,6 +3,7 @@ var faye = require("faye");
 var path = require("path");
 var drone = require("ar-drone").createClient();
 var fs = require('fs');
+var droneStream = require("dronestream");
 
 (function() {
   drone.config('general:navdata_demo', 'TRUE');
@@ -18,6 +19,8 @@ var fs = require('fs');
 
   var server = require("http").createServer(app);
 
+  droneStream.listen(server);
+
   new faye.NodeAdapter({
     mount: '/faye',
     timeout: 45
@@ -25,9 +28,7 @@ var fs = require('fs');
 
   var socket = new faye.Client("http://localhost:" + (app.get("port")) + "/faye");
   socket.subscribe("/drone/move", function(cmd) {
-    var _name;
-
-    var _name = cmd.action
+    var _name = cmd.action;
     return typeof drone[_name] === "function" ? drone[_name](cmd.speed) : void 0;
   });
 
@@ -44,6 +45,7 @@ var fs = require('fs');
 
   var saveNextFrame = false;
   socket.subscribe("/drone/takephoto", function(cmd) {
+    console.log("TAKE PHOTO");
     saveNextFrame = true;
   });
 
@@ -73,26 +75,26 @@ var fs = require('fs');
 
   var imageSendingPaused = false;
 
-  var frameCount = 0;
-  drone.createPngStream().on("data", function(frame) {
-    currentImg = frame;
-    if (imageSendingPaused) {
-      return;
-    }
+  // var frameCount = 0;
+  // drone.getPngStream().on("data", function(frame) {
+  //   currentImg = frame;
+  //   if (imageSendingPaused) {
+  //     return;
+  //   }
 
-    if (saveNextFrame) {
-      frameCount++;
-      savePhoto(frame, frameCount);
+  //   if (saveNextFrame) {
+  //     frameCount++;
+  //     savePhoto(frame, frameCount);
 
-      saveNextFrame = false;
-    }
+  //     saveNextFrame = false;
+  //   }
 
-    socket.publish("/drone/image", "/image/" + (Math.random()));
-    imageSendingPaused = true;
-    return setTimeout(function() {
-      imageSendingPaused = false;
-    }, 100);
-  });
+  //   socket.publish("/drone/image", "/image/" + (Math.random()));
+  //   imageSendingPaused = true;
+  //   return setTimeout(function() {
+  //     imageSendingPaused = false;
+  //   }, 100);
+  // });
 
   app.get("/image/:id", function(req, res) {
     res.writeHead(200, {
@@ -103,17 +105,19 @@ var fs = require('fs');
 }).call(this);
 
 function savePhoto(frame, count) {
-  console.log('save Photo');
   var thePath = path.join(__dirname, 'pics');
   if (count > 10) {
     return;
   }
 
-  fs.writeFile(thePath + '/' + count + '.png', frame, function(err) {
+  var d = new Date();
+  var filename = d.toString() + '.png';
+
+  fs.writeFile(thePath + '/' + filename, frame, function(err) {
     if (err) {
         console.log(err);
     } else {
-        console.log("Photo was saved!", count + '.png');
+        console.log("Photo was saved!", filename);
     }
   });
 }

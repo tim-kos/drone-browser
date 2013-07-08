@@ -18,8 +18,9 @@ body {
     position: absolute;
     top: 550px;
     left: 50%;
-    width: 70%;
-    margin-left: -35%;
+    width: 700px;
+    margin-left: -350px;
+    text-align: center;
     font-size: 16px;
 }
 #stats li {
@@ -32,7 +33,7 @@ body {
 }
 .battery-status {
     position: absolute;
-    top: 56px;
+    top: 90px;
     left: 50%;
     width: 40px;
     margin-left: -20px;
@@ -43,7 +44,7 @@ body {
 
 .connection-status {
     position: absolute;
-    top: 480px;
+    top: 510px;
     left: 50%;
     width: 300px;
     margin-left: -150px;

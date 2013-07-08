@@ -37,6 +37,7 @@ $(function() {
   var i = 0;
   faye.subscribe("/drone/navdata", function(data) {
     connected = true;
+    // console.log(data);
     var types = [
       "batteryPercentage", "clockwiseDegrees", "frontBackDegrees",
       "leftRightDegrees", "xVelocity", "yVelocity", "zVelocity"
@@ -139,6 +140,8 @@ $(function() {
   });
 
   $("*[rel=tooltip]").tooltip();
+
+  new NodecopterStream(document.getElementById("cam"));
 });
 
 function checkConnectStatus() {

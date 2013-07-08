@@ -10,10 +10,11 @@
         <div class="btn-toolbar">
             <div class="input-append btn-group">
                 <button class="take-photo js-take-photo btn btn-success">Take photo</button>
-                <button class="take-photo js-switch-to-bottom-camera btn btn-success">Bottom camera</button>
-                <button class="take-photo js-switch-to-front-camera btn btn-success">Front camera</button>
+                <button class="take-photo js-switch-to-bottom-camera btn btn-primary">Bottom camera</button>
+                <button class="take-photo js-switch-to-front-camera btn btn-warning">Front camera</button>
                 <button class="btn btn-danger" data-action="drone" data-param="disableEmergency"><i class="icon-wrench icon-white"></i> Recover</button>
             </div>
+            <div class="clearfix"></div>
             <div class="input-append btn-group">
                 <button class="btn dropdown-toggle" data-toggle="dropdown">Animations <span class="caret"></span></button>
                 <ul class="dropdown-menu">
@@ -76,7 +77,10 @@
         <span class="battery-status js-battery-status"></span>
     </div>
 
-    <img id="cam" src="default.jpg" />
+    <!-- <img id="cam" /> -->
+
+    <div id="cam"></div>
+
     <div class="connection-status">Status: <span>Disconnected</span></div>
 
     <ul id="stats">
@@ -93,5 +97,6 @@
     <script src="/faye/client.js"></script>
     <script src="components/bootstrap/js/bootstrap.min.js"></script>
     <script src="/client.js"></script>
+    <script src="/nodecopter-client.js"></script>
 </body>
 </html>
